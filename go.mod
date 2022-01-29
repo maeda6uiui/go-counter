@@ -1,3 +1,3 @@
-module github.com/maeda6uiui/counter
+module github.com/maeda6uiui/go-counter
 
 go 1.17
