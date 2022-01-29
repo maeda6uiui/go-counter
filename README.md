@@ -1,4 +1,4 @@
-# Counter
+# go-counter
 
 ## 概要
 
