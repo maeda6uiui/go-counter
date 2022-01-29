@@ -84,29 +84,29 @@ func TestCounter(t *testing.T) {
 	lines = lines[:len(lines)-1]
 
 	t.Log("Counterを作成しています...")
-	counter := newCounter(lines)
+	counter := NewCounter(lines)
 
 	t.Log("Counterのテストを行っています...")
 
-	if counter.len() == len(counts) {
-		t.Log("PASS: len()")
+	if counter.Len() == len(counts) {
+		t.Log("PASS: Len()")
 	} else {
-		t.Error("ERROR: len()")
+		t.Error("ERROR: Len()")
 	}
 
-	if counter.contains("yH") {
-		t.Log("PASS: contains()")
+	if counter.Contains("yH") {
+		t.Log("PASS: Contains()")
 	} else {
-		t.Error("ERROR: contains()")
+		t.Error("ERROR: Contains()")
 	}
 
-	if counter.count("yH") == counts["yH"] {
-		t.Log("PASS: count()")
+	if counter.Count("yH") == counts["yH"] {
+		t.Log("PASS: Count()")
 	} else {
-		t.Error("ERROR: count()")
+		t.Error("ERROR: Count()")
 	}
 
-	keys, freqs := counter.mostCommon()
+	keys, freqs := counter.MostCommon()
 	if err := createCountsFile("./Data/counts_2.txt", keys, freqs); err != nil {
 		t.Fatal(err)
 	}

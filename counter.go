@@ -9,7 +9,7 @@ type Counter struct {
 	freqs []int
 }
 
-func newCounter(slice []string) *Counter {
+func NewCounter(slice []string) *Counter {
 	c := new(Counter)
 	c.keys = make([]string, 0)
 	c.freqs = make([]int, 0)
@@ -23,20 +23,20 @@ func newCounter(slice []string) *Counter {
 	return c
 }
 
-func (c *Counter) len() int {
+func (c *Counter) Len() int {
 	return len(c.counts)
 }
 
-func (c *Counter) count(k string) int {
+func (c *Counter) Count(k string) int {
 	return c.counts[k]
 }
 
-func (c *Counter) contains(k string) bool {
+func (c *Counter) Contains(k string) bool {
 	_, ok := c.counts[k]
 	return ok
 }
 
-func (c *Counter) mostCommon() ([]string, []int) {
+func (c *Counter) MostCommon() ([]string, []int) {
 	if len(c.keys) == 0 {
 		type kv struct {
 			key   string
