@@ -121,9 +121,9 @@ func TestCounter(t *testing.T) {
 	}
 
 	if counterHash == correctHash {
-		t.Log("PASS: mostCommon()")
+		t.Log("PASS: MostCommon()")
 	} else {
-		t.Error("ERROR: mostCommon()")
+		t.Error("ERROR: MostCommon()")
 	}
 
 	t.Log("テストが終了しました")
