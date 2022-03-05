@@ -23,6 +23,15 @@ func NewCounter(slice []string) *Counter {
 	return c
 }
 
+func NewCounterFromMap(counts map[string]int) *Counter {
+	c := new(Counter)
+	c.keys = make([]string, 0)
+	c.freqs = make([]int, 0)
+	c.counts = counts
+
+	return c
+}
+
 func (c *Counter) Len() int {
 	return len(c.counts)
 }
