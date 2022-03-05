@@ -68,6 +68,46 @@ func getFileMD5Hash(inputFilepath string) (string, error) {
 	return string(v), nil
 }
 
+func innerTestCounter(t *testing.T, c *Counter, counts map[string]int, countsOutputFilepath string) {
+	if c.Len() == len(counts) {
+		t.Log("PASS: Len()")
+	} else {
+		t.Error("ERROR: Len()")
+	}
+
+	if c.Contains("yH") {
+		t.Log("PASS: Contains()")
+	} else {
+		t.Error("ERROR: Contains()")
+	}
+
+	if c.Count("yH") == counts["yH"] {
+		t.Log("PASS: Count()")
+	} else {
+		t.Error("ERROR: Count()")
+	}
+
+	keys, freqs := c.MostCommon()
+	if err := createCountsFile(countsOutputFilepath, keys, freqs); err != nil {
+		t.Fatal(err)
+	}
+
+	correctHash, err := getFileMD5Hash("./Data/counts.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	cHash, err := getFileMD5Hash(countsOutputFilepath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if cHash == correctHash {
+		t.Log("PASS: MostCommon()")
+	} else {
+		t.Error("ERROR: MostCommon()")
+	}
+}
+
 func TestCounter(t *testing.T) {
 	t.Log("テストに使用するデータを読み込んでいます...")
 
@@ -85,46 +125,15 @@ func TestCounter(t *testing.T) {
 
 	t.Log("Counterを作成しています...")
 	counter := NewCounter(lines)
+	counter2 := NewCounterFromMap(counts)
 
 	t.Log("Counterのテストを行っています...")
 
-	if counter.Len() == len(counts) {
-		t.Log("PASS: Len()")
-	} else {
-		t.Error("ERROR: Len()")
-	}
+	t.Log("Sliceから作成されたCounterのテストを行っています...")
+	innerTestCounter(t, counter, counts, "./Data/counts_2.txt")
 
-	if counter.Contains("yH") {
-		t.Log("PASS: Contains()")
-	} else {
-		t.Error("ERROR: Contains()")
-	}
-
-	if counter.Count("yH") == counts["yH"] {
-		t.Log("PASS: Count()")
-	} else {
-		t.Error("ERROR: Count()")
-	}
-
-	keys, freqs := counter.MostCommon()
-	if err := createCountsFile("./Data/counts_2.txt", keys, freqs); err != nil {
-		t.Fatal(err)
-	}
-
-	correctHash, err := getFileMD5Hash("./Data/counts.txt")
-	if err != nil {
-		t.Fatal(err)
-	}
-	counterHash, err := getFileMD5Hash("./Data/counts_2.txt")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if counterHash == correctHash {
-		t.Log("PASS: MostCommon()")
-	} else {
-		t.Error("ERROR: MostCommon()")
-	}
+	t.Log("Mapから作成されたCounterのテストを行っています...")
+	innerTestCounter(t, counter2, counts, "./Data/counts_3.txt")
 
 	t.Log("テストが終了しました")
 }
