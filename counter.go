@@ -4,15 +4,10 @@ import "sort"
 
 type Counter struct {
 	counts map[string]int
-
-	keys  []string
-	freqs []int
 }
 
 func NewCounter(slice []string) *Counter {
 	c := new(Counter)
-	c.keys = make([]string, 0)
-	c.freqs = make([]int, 0)
 
 	counts := make(map[string]int)
 	for _, k := range slice {
@@ -25,8 +20,6 @@ func NewCounter(slice []string) *Counter {
 
 func NewCounterFromMap(counts map[string]int) *Counter {
 	c := new(Counter)
-	c.keys = make([]string, 0)
-	c.freqs = make([]int, 0)
 	c.counts = counts
 
 	return c
@@ -46,7 +39,7 @@ func (c *Counter) Contains(k string) bool {
 }
 
 func (c *Counter) getFrequencies(descending bool) ([]string, []int) {
-	if len(c.keys) == 0 {
+	if len(c.counts) == 0 {
 		return []string{}, []int{}
 	}
 
