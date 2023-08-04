@@ -45,17 +45,21 @@ func (c *Counter) Contains(k string) bool {
 	return ok
 }
 
-func (c *Counter) MostCommon() ([]string, []int) {
+func (c *Counter) getFrequencies(descending bool) ([]string, []int) {
 	if len(c.keys) == 0 {
-		type kv struct {
-			key   string
-			value int
-		}
-		var kvs []kv
-		for k, v := range c.counts {
-			kvs = append(kvs, kv{k, v})
-		}
+		return []string{}, []int{}
+	}
 
+	type kv struct {
+		key   string
+		value int
+	}
+	var kvs []kv
+	for k, v := range c.counts {
+		kvs = append(kvs, kv{k, v})
+	}
+
+	if descending {
 		sort.Slice(kvs, func(i, j int) bool {
 			if kvs[i].value > kvs[j].value {
 				return true
@@ -66,12 +70,33 @@ func (c *Counter) MostCommon() ([]string, []int) {
 
 			return kvs[i].key > kvs[j].key
 		})
+	} else {
+		sort.Slice(kvs, func(i, j int) bool {
+			if kvs[i].value < kvs[j].value {
+				return true
+			}
+			if kvs[i].value > kvs[j].value {
+				return false
+			}
 
-		for _, kv := range kvs {
-			c.keys = append(c.keys, kv.key)
-			c.freqs = append(c.freqs, kv.value)
-		}
+			return kvs[i].key < kvs[j].key
+		})
 	}
 
-	return c.keys, c.freqs
+	keys := make([]string, len(kvs))
+	freqs := make([]int, len(kvs))
+	for i, kv := range kvs {
+		keys[i] = kv.key
+		freqs[i] = kv.value
+	}
+
+	return keys, freqs
+}
+
+func (c *Counter) MostCommon() ([]string, []int) {
+	return c.getFrequencies(true)
+}
+
+func (c *Counter) LeastCommon() ([]string, []int) {
+	return c.getFrequencies(false)
 }
