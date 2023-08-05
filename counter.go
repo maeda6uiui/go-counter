@@ -89,7 +89,3 @@ func (c *Counter) getFrequencies(descending bool) ([]string, []int) {
 func (c *Counter) MostCommon() ([]string, []int) {
 	return c.getFrequencies(true)
 }
-
-func (c *Counter) LeastCommon() ([]string, []int) {
-	return c.getFrequencies(false)
-}
