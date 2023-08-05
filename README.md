@@ -1,14 +1,18 @@
 # go-counter
 
-## 概要
+## Overview
 
-Pythonの`collections.Counter`みたいな機能をGolangで実装しました。
+Returns the frequency of each element in a string slice.
 
-## 使い方
+## Usage
+
+### Installation
 
 ```
 go get github.com/maeda6uiui/go-counter
 ```
+
+### Code sample
 
 ```go
 package main
@@ -36,3 +40,4 @@ d 2
 c 2
 b 1
 ```
+
