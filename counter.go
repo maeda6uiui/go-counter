@@ -38,7 +38,7 @@ func (c *Counter) Contains(k string) bool {
 	return ok
 }
 
-func (c *Counter) getFrequencies(descending bool) ([]string, []int) {
+func (c *Counter) MostCommon() ([]string, []int) {
 	if len(c.counts) == 0 {
 		return []string{}, []int{}
 	}
@@ -52,29 +52,16 @@ func (c *Counter) getFrequencies(descending bool) ([]string, []int) {
 		kvs = append(kvs, kv{k, v})
 	}
 
-	if descending {
-		sort.Slice(kvs, func(i, j int) bool {
-			if kvs[i].value > kvs[j].value {
-				return true
-			}
-			if kvs[i].value < kvs[j].value {
-				return false
-			}
+	sort.Slice(kvs, func(i, j int) bool {
+		if kvs[i].value > kvs[j].value {
+			return true
+		}
+		if kvs[i].value < kvs[j].value {
+			return false
+		}
 
-			return kvs[i].key > kvs[j].key
-		})
-	} else {
-		sort.Slice(kvs, func(i, j int) bool {
-			if kvs[i].value < kvs[j].value {
-				return true
-			}
-			if kvs[i].value > kvs[j].value {
-				return false
-			}
-
-			return kvs[i].key < kvs[j].key
-		})
-	}
+		return kvs[i].key > kvs[j].key
+	})
 
 	keys := make([]string, len(kvs))
 	freqs := make([]int, len(kvs))
@@ -84,8 +71,4 @@ func (c *Counter) getFrequencies(descending bool) ([]string, []int) {
 	}
 
 	return keys, freqs
-}
-
-func (c *Counter) MostCommon() ([]string, []int) {
-	return c.getFrequencies(true)
 }
