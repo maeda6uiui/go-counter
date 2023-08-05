@@ -18,11 +18,11 @@ func TestLen(t *testing.T) {
 	}{
 		"test_1": {
 			items: []string{"a", "a", "a", "b", "c", "d", "a", "a", "d", "c"},
-			want:  10,
+			want:  4,
 		},
 		"test_2": {
 			items: []string{"こんにちは", "世界", "あいうえお", "Hello", "世界", "こんにちは", "Hello"},
-			want:  7,
+			want:  4,
 		},
 	}
 	for name, tt := range tests {
@@ -106,7 +106,7 @@ func TestMostCommon(t *testing.T) {
 		},
 		"test_3": {
 			items:     []string{"あ", "あ", "い", "う", "え", "え", "え", "お"},
-			wantKeys:  []string{"え", "あ", "い", "う", "お"},
+			wantKeys:  []string{"え", "あ", "お", "う", "い"},
 			wantFreqs: []int{3, 2, 1, 1, 1},
 		},
 	}
@@ -124,14 +124,15 @@ func TestMostCommon(t *testing.T) {
 	}
 }
 
-func loadCounts(filepath string) (map[string]int, error) {
+func loadCounts(filepath string) ([]string, []int, error) {
 	fp, err := os.Open(filepath)
 	if err != nil {
-		return nil, xerrors.Errorf("Failed to load file %v: %w", filepath, err)
+		return nil, nil, xerrors.Errorf("Failed to load file %v: %w", filepath, err)
 	}
 	defer fp.Close()
 
-	counts := make(map[string]int)
+	keys := make([]string, 0)
+	freqs := make([]int, 0)
 
 	scanner := bufio.NewScanner(fp)
 	for scanner.Scan() {
@@ -141,52 +142,55 @@ func loadCounts(filepath string) (map[string]int, error) {
 		key := splits[1]
 		freq, err := strconv.Atoi(splits[0])
 		if err != nil {
-			return nil, xerrors.Errorf("Failed to convert string to int: %v: %w", splits[0], err)
+			return nil, nil, xerrors.Errorf("Failed to convert string to int: %v: %w", splits[0], err)
 		}
 
-		counts[key] = freq
+		keys = append(keys, key)
+		freqs = append(freqs, freq)
 	}
 	if err := scanner.Err(); err != nil {
-		return nil, xerrors.Errorf("Failed to load file %v: %w", filepath, err)
+		return nil, nil, xerrors.Errorf("Failed to load file %v: %w", filepath, err)
 	}
 
-	return counts, nil
+	return keys, freqs, nil
 }
 
 func TestMostCommon2(t *testing.T) {
 	tests := map[string]struct {
-		sortedCountsFilepath   string
+		wantCountsFilepath     string
 		shuffledCountsFilepath string
-		loadCounts             func(filepath string) (map[string]int, error)
+		loadCounts             func(filepath string) ([]string, []int, error)
 	}{
 		"test_1": {
-			sortedCountsFilepath:   "./Data/string_counts_sorted.txt",
+			wantCountsFilepath:     "./Data/string_counts_want.txt",
 			shuffledCountsFilepath: "./Data/string_counts_shuffled.txt",
 			loadCounts:             loadCounts,
 		},
 	}
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			sortedCounts, err := tt.loadCounts(tt.sortedCountsFilepath)
+			wantKeys, wantFreqs, err := tt.loadCounts(tt.wantCountsFilepath)
 			if err != nil {
-				t.Errorf("Failed to load counts file: %v", tt.sortedCountsFilepath)
+				t.Errorf("Failed to load counts file: %v", tt.wantCountsFilepath)
 			}
 
-			shuffledCounts, err := tt.loadCounts(tt.shuffledCountsFilepath)
+			shuffledKeys, shuffledFreqs, err := tt.loadCounts(tt.shuffledCountsFilepath)
 			if err != nil {
 				t.Errorf("Failed to load counts file: %v", tt.shuffledCountsFilepath)
 			}
 
-			c := NewCounterFromMap(shuffledCounts)
-			gotKeys, gotFreqs := c.MostCommon()
-
-			got := make(map[string]int, len(gotKeys))
-			for i := 0; i < len(gotKeys); i++ {
-				got[gotKeys[i]] = gotFreqs[i]
+			counts := make(map[string]int, len(shuffledKeys))
+			for i := 0; i < len(shuffledKeys); i++ {
+				counts[shuffledKeys[i]] = shuffledFreqs[i]
 			}
 
-			if !reflect.DeepEqual(got, sortedCounts) {
-				t.Errorf("MostCommon() does not match with %v", tt.sortedCountsFilepath)
+			c := NewCounterFromMap(counts)
+			gotKeys, gotFreqs := c.MostCommon()
+			if !reflect.DeepEqual(gotKeys, wantKeys) {
+				t.Errorf("MostCommon().keys does not match with %v", tt.wantCountsFilepath)
+			}
+			if !reflect.DeepEqual(gotFreqs, wantFreqs) {
+				t.Errorf("MostCommon().freqs does not match with %v", tt.wantCountsFilepath)
 			}
 		})
 	}

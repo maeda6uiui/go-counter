@@ -60,7 +60,7 @@ func (c *Counter) MostCommon() ([]string, []int) {
 			return false
 		}
 
-		return kvs[i].key < kvs[j].key
+		return kvs[i].key > kvs[j].key
 	})
 
 	keys := make([]string, len(kvs))
